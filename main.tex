@@ -1,7 +1,8 @@
 \documentclass{article}
 
 \usepackage{cmap}					
-\usepackage{mathtext} 				
+\usepackage{mathtext} 			
+\usepackage{amssymb}
 \usepackage[T2A]{fontenc}			
 \usepackage[utf8]{inputenc}	
 \usepackage[english,russian]{babel}	
@@ -25,113 +26,34 @@
 Рассмотрим алгоритм экспоненциального взвешивания на основе градиента с переменным шагом обучения. Приведите исчерпывающие выкладки и получите оценку на кумулятивный регрет. Как следует выбирать параметр обучения на каждом шаге?
 
 \section{Решение}
-В алгоритме экспоненциального взвешивания экспертных решений оптимальная
-оценка на кумулятивный регрет имеет вид
-
-\[
-R_{k,t} \le \frac{\ln{N}}{\varepsilon} + \frac{\varepsilon t}{8} = O(t) 
-\]
-
-а выбор оптимального параметра $\varepsilon$ возможен только при априорном знании количества раундов $T$. Вместе с тем особый интерес представляют алгоритмы, для которых справедлива оценка $R_{k,t} =o(t)$, т. е. средний относительно числа раундов кумулятивный регрет стремится к нулю: 
+Рассмотрим алгоритм экспоненциального взвешивания на основе градиента с переменным шагом обучения. Будем предполагать, что функция потерь $l(x, y)$ является не только выпуклой по первому аргументу, но и дифференцируемой, а ее градиент по x будем обозначать через $\nabla l(x, y)$. Выбор оптимального параметра $\varepsilon$ (шаг обучения) возможен только при априорном знании количества раундов $T$. Вместе с тем особый интерес представляют алгоритмы, для которых справедлива оценка $R_{k,t} =o(t)$, т. е. средний относительно числа раундов кумулятивный регрет стремится к нулю:
 
 \[
 \frac{R_{k,t}}{t} \rightarrow 0 \quad при \quad t \rightarrow +\infty
 \]
 
-Для решения этой проблемы параметр $\varepsilon$ можно выбирать в зависимости от раунда $t$, т. е. $\varepsilon = \varepsilon_t$. В такой постановке предсказание алгоритмом экспоненциального взвешивания экспертных решений с переменным параметром $\varepsilon_t$ осуществляется по формуле:
+Для решения этой проблемы параметр $\varepsilon$ можно выбирать в зависимости от раунда $t$, т. е. $\varepsilon = \varepsilon_t$.
+
+В такой постановке предсказание алгоритмом экспоненциального взвешивания на основе градиента  с переменным шагом обучения осуществляется по формуле
 
 \[
-\hat{p_t} = \frac{\sum^N_{k=1} e^{-\varepsilon_tL_{k,t-1}} f_{k,t} }{\sum^N_{k=1} e^{-\varepsilon_tL_{k,t-1}}} 
+\hat{p}_t = \frac{ \sum^N_{k=1} exp[-\varepsilon_t \sum^{t-1}_{s=1} \langle \nabla l(\hat{p}_s, y_s), f_{k,t} \rangle ] f_{k,t} }{ \sum^N_{k=1} exp[-\varepsilon_t \sum^{t-1}_{s=1} \langle \nabla l(\hat{p}_s, y_s), f_{k,t} \rangle ] }
 \]
 
-Предположим, что функция потерь $l(\cdot, \cdot)$ является выпуклой по первому аргументу и принимает значения из отрезка [0, 1]. Тогда для любой монотонно убывающей последовательности $\{\varepsilon_s\}_{s\in N}$ положительных чисел, для любого раунда $t \ge 1$, а также произвольных исходов $\{y_s\}^t_{s=1}$ кумулятивный регрет для алгоритма экспоненциального взвешивания с переменным параметром $\varepsilon_t$ удовлетворяет неравенству
+Докажем следующее утверждение.
+
+Пусть пространство решений $D$ является выпуклым подмножеством единичного евклидова шара $\{ u \in \mathbb{R} ^d : \lvert \lvert  u\lvert \lvert_2 \le 1\}$ и функция потерь $l(\cdot, \cdot)$ является
+выпуклой по первому аргументу, а ее градиент удовлетворяет неравенству
 
 \[
-R_{k,t} \le \frac{\ln{N}}{\varepsilon_t} + \frac{1}{8} \sum^t_{s=1} \varepsilon_s.
+\lvert \lvert \nabla l(u, y) \lvert \lvert_2 \le 1
 \]
 
-Доказательство: \\
-
-Из выпуклости функции потерь $l(\cdot, \cdot)$ по первому аргументу следует неравенство
-
-\[ 
-l(\hat{p_t}, y_t) = l(\sum^N_{k=1} \frac{w_k(t-1)}{W_{t-1}} f_{k,t}, y_t) \le \sum^N_{k=1} \frac{w_k(t-1)}{W_{t-1}} l(f_{k,t}, y_t). 
-\]
-
-Далее, воспользуемся неравенством Хёфдинга, сразу применяя к левой и правой части функцию $\xi \mapsto e^{\varepsilon_t \xi}$, а затем еще и предыдущим неравенством:
-
-\[ 
-\sum^N_{k=1} \frac{w_k(t-1)}{W_{t-1}} exp[-\varepsilon_t \cdot l(f_{k,t}, y_t)] \le 
-exp[ - \varepsilon_t \sum^N_{k=1} \frac{w_k(t-1)}{W_{t-1}} l(f_{k,t}, y_t) + \frac{\varepsilon^2_t}{8} ] \le
-exp[-\varepsilon_t l(\hat{p_t}, y_t) + \frac{\varepsilon^2_t}{8}]
-\]
-
-Умножив левую и правую часть последнего неравенства на $ e^{\varepsilon_t l(\hat{p_t}, y_t) + \frac{\varepsilon^2_t}{8}}$ в итоге получим
-
-\begin{equation}
-\sum^N_{k=1} \frac{w_k(t-1)}{W_{t-1}} exp[-\varepsilon_t \cdot l(f_{k,t}, y_t) - \frac{\varepsilon^2_t}{8} + \varepsilon_t l(\hat{p_t}, y_t) ] \le 1.
-\end{equation}
-
-Введем вспомогательные величины
-
-\[  
-a_k(t-1) = exp[ -\varepsilon_{t-1} L_{k,t-1} + \varepsilon_{t-1} (\hat{L}_{t-1} - \frac{1}{8} \sum^{t-1}_{s=1} \varepsilon_s)],
-\]
-
-заметив, что 
-
-\begin{equation}
-\frac{w_k(t-1)}{W_{t-1}} = \frac{ \frac{1}{N} [a_k(t-1)]^{\varepsilon_t / \varepsilon_{t-1}} }{ \sum^N_{j=1} \frac{1}{N} [a_j(t - 1)]^{\varepsilon_t / \varepsilon_{t-1}} }.
-\end{equation}
-
-Используя принцип математической индукции покажем, что
-
-\begin{equation}
-\sum^N_{j=1} \frac{1}{N} a_j(t) \le 1.
-\end{equation}
-
-Очевидно, что $a_j (0) = 1$, поэтому при $t = 0$ неравенство (3) справедливо. Пусть теперь выполняется неравенство (3) при $t := t - 1$:
-
-\[ 
-\sum^N_{j=1} \frac{1}{N} a_j(t-1) \le 1.
-\]
-
-Поскольку $\varepsilon_{t-1} \ge \varepsilon_t > 0$, то функция $\xi \mapsto \xi^{\varepsilon_t / \varepsilon_{t-1}}$ является вогнутой, поэтому 
-
-\[ 
-\sum^N_{j=1} \frac{1}{N} [a_j(t-1)]^{\varepsilon_t / \varepsilon_{t-1}} \le [\sum^N_{j=1} \frac{1}{N} a_j(t-1)]^{\varepsilon_t / \varepsilon_{t-1}} \le 1.
-\]
-
-Используя полученную выше оценку, получим неравенство
+для $u \in D, y \in Y$. Тогда для любого раунда $t$ и $\varepsilon_t > 0$, а также произвольных исходов
+$\{y_s\}^t_{s=1} \subset Y$ справедлива следующая оценка на куммулятивный регрет:
 
 \[
-\frac{w_k(t-1)}{W_{t-1}} \ge \frac{1}{N} [a_j(t-1)]^{\varepsilon_t / \varepsilon_{t-1}},
-\]
-
-которое вместе с (1) приводит к неравенству
-
-\[
-\sum^N_{k=1} \frac{1}{N} [a_k(t-1)]^{\varepsilon_t / \varepsilon_{t-1}} exp [-\varepsilon_t \cdot l(f_{k,t}, y_t) - 
-\frac{\varepsilon^2_t}{8} + \varepsilon_t \cdot l(\hat{p_t}, y_t) ] \le 1.
-\]
-
-Вместе с тем простая проверка показывает, что
- 
-\[
-a_k(t) = [a_k(t-1)]^{\varepsilon_t / \varepsilon_{t-1}} exp [-\varepsilon_t \cdot l(f_{k,t}, y_t) - 
-\frac{\varepsilon^2_t}{8} + \varepsilon_t \cdot l(\hat{p_t}, y_t) ].
-\]
-
-следовательно последнее неравенство и есть (3). Наконец, в силу неравенста (3) справедливы выкладки
-
-\[
-1 \ge \sum^N_{k=1} \frac{1}{N} a_k(t) \ge \frac{1}{N} a_k(t) = \frac{1}{N}  exp [-\varepsilon_t L_{k,t} + \varepsilon_t (\hat{L_t} - \frac{1}{8} \sum^t_{s=1} \varepsilon_s )],
-\]
-
-откуда после логарифмирования и упрощения получаем итоговое неравенство
-
-\[
-\hat{L_t} - L_{k,t} \le \frac{\ln{N}}{\varepsilon_t} + \frac{1}{8} \sum^t_{s=1} \varepsilon_s.
+\hat{L}_t - L_{k,t} \le \frac{\ln{N}}{\varepsilon_t} + \frac{\varepsilon_t t}{2}.
 \]
 
 \end{document}
