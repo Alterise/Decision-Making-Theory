@@ -104,5 +104,30 @@ a_k(t-1) = exp[ -\varepsilon_{t-1} L_{k,t-1} + \varepsilon_{t-1} (\hat{L}_{t-1} 
 \frac{w_k(t-1)}{W_{t-1}} \ge \frac{1}{N} [a_j(t-1)]^{\varepsilon_t / \varepsilon_{t-1}},
 \]
 
+которое вместе с (1) приводит к неравенству
+
+\[
+\sum^N_{k=1} \frac{1}{N} [a_k(t-1)]^{\varepsilon_t / \varepsilon_{t-1}} exp [-\varepsilon_t \cdot l(f_{k,t}, y_t) - 
+\frac{\varepsilon^2_t}{8} + \varepsilon_t \cdot l(\hat{p_t}, y_t) ] \le 1.
+\]
+
+Вместе с тем простая проверка показывает, что
+ 
+\[
+a_k(t) = [a_k(t-1)]^{\varepsilon_t / \varepsilon_{t-1}} exp [-\varepsilon_t \cdot l(f_{k,t}, y_t) - 
+\frac{\varepsilon^2_t}{8} + \varepsilon_t \cdot l(\hat{p_t}, y_t) ].
+\]
+
+следовательно последнее неравенство и есть (3). Наконец, в силу неравенста (3) справедливы выкладки
+
+\[
+1 \ge \sum^N_{k=1} \frac{1}{N} a_k(t) \ge \frac{1}{N} a_k(t) = \frac{1}{N}  exp [-\varepsilon_t L_{k,t} + \varepsilon_t (\hat{L_t} - \frac{1}{8} \sum^t_{s=1} \varepsilon_s )],
+\]
+
+откуда после логарифмирования и упрощения получаем итоговое неравенство
+
+\[
+\hat{L_t} - L_{k,t} \le \frac{\ln{N}}{\varepsilon_t} + \frac{1}{8} \sum^t_{s=1} \varepsilon_s.
+\]
 
 \end{document}
