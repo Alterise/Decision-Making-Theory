@@ -76,6 +76,27 @@ l_*(u, y_s) = \langle \nabla l(\hat{p}_s, y_s), u \rangle, \quad u \in D.
 l_\circ (u, y_s) = \frac{1 + l_*(u, y_s)}{2},
 \]
 
-принимающую значения из отрезка $[0, 1]$.
+принимающую значения из отрезка $[0, 1]$. Тогда
+
+\[
+\frac{1}{2} \sum^t_{s=1} \langle \hat{p}_s - f_{k,s}, \nabla l(\hat{p}_s, y_s) \rangle = \frac{1}{2} \sum^t_{s=1} l_*(\hat{p}_s, y_s) - \frac{1}{2} \sum^t_{s=1} l_*(f_{k,s}, y_s) = \frac{1}{2} \sum^t_{s=1} l_\circ(\hat{p}_s, y_s) - \frac{1}{2} \sum^t_{s=1} l_\circ(f_{k,s}, y_s) \le \frac{\ln{N}}{2 \varepsilon_t} + \frac{\varepsilon_t t}{4},
+\]
+
+поскольку для функции потерь $l_\circ(\cdot, \cdot)$ обычный алгоритм экспоненциального взвешивания в нашем случае имеет параметр $2 \varepsilon_t$. Вспоминая, что функция $l(\cdot, \cdot)$ является выпуклой по первому аргументу, записываем неравенство
+
+\[
+l(f_{k,s}, y_s) \ge l(\hat{p}_s, y_s) + \langle f_{k, s} - \hat{p}_s, \nabla l(\hat{p}_s, y_s) \rangle
+\]
+откуда 
+
+\[
+\langle \hat{p}_s - f_{k, s}, \nabla l(\hat{p}_s, y_s) \rangle \ge l(\hat{p}_s, y_s) - l(f_{k,s}, y_s).
+\]
+
+Таким образом,
+
+\[
+\hat{L}_t - L_{k,t} \le \langle \hat{p}_s - f_{k, s}, \nabla l(\hat{p}_s, y_s) \rangle \le \frac{ln{N}}{\varepsilon_t} + \frac{\varepsilon_t t}{2}.
+\]
 
 \end{document}
